@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CypherPunks | AI Roadside Vehicle Diagnostics & Emergency Assistance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: #111827;
+            --card-border: #1f293d;
+            --accent-red: #ef4444;
+            --accent-orange: #f59e0b;
+            --accent-green: #10b981;
+            --accent-blue: #3b82f6;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Header */
+        header {
+            background: linear-gradient(180deg, #161f33 0%, #111827 100%);
+            border-bottom: 1px solid var(--card-border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            background: linear-gradient(135deg, #ef4444, #f59e0b);
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+        }
+
+        .brand-title h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-title p {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .badge-guardrail {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--accent-green);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Container */
+        .main-container {
+            flex: 1;
+            display: flex;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1.5rem;
+            gap: 1.5rem;
+        }
+
+        /* Left Sidebar: Problem context & Quick Tests */
+        .sidebar {
+            width: 360px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 1.2rem;
+        }
+
+        .card-header {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #fff;
+        }
+
+        .problem-tag {
+            background: rgba(239, 68, 68, 0.12);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            margin-bottom: 8px;
+            display: inline-block;
+            font-weight: 600;
+        }
+
+        .problem-desc {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+
+        .quick-btn {
+            width: 100%;
+            background: #1e293b;
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.82rem;
+            text-align: left;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quick-btn:hover {
+            background: #27354f;
+            border-color: var(--accent-blue);
+            transform: translateY(-1px);
+        }
+
+        .quick-btn.danger:hover {
+            border-color: var(--accent-red);
+        }
+
+        .guardrail-info {
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 0.78rem;
+            color: #fcd34d;
+            line-height: 1.4;
+        }
+
+        /* Chat Panel */
+        .chat-section {
+            flex: 1;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .chat-header {
+            padding: 1rem 1.4rem;
+            background: #141c2e;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            max-height: 60vh;
+        }
+
+        .msg-bubble {
+            max-width: 85%;
+            padding: 1rem 1.2rem;
+            border-radius: 12px;
+            line-height: 1.55;
+            font-size: 0.92rem;
+        }
+
+        .msg-user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #ffffff;
+            border-bottom-right-radius: 2px;
+        }
+
+        .msg-bot {
+            align-self: flex-start;
+            background: #172236;
+            border: 1px solid var(--card-border);
+            border-bottom-left-radius: 2px;
+        }
+
+        .msg-bot.out-of-scope {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .bot-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .badge-vehicle {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+        }
+
+        .badge-blocked {
+            background: rgba(239, 68, 68, 0.25);
+            color: #f87171;
+        }
+
+        .chat-input-bar {
+            padding: 1rem 1.4rem;
+            background: #141c2e;
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: #0d1322;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: #fff;
+            font-size: 0.92rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 0 20px;
+            font-weight: 600;
+            font-size: 0.92rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .send-btn:hover {
+            opacity: 0.92;
+            transform: scale(1.02);
+        }
+
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            padding: 10px 16px;
+            background: #172236;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dot-flashing {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 5px;
+            background-color: var(--text-muted);
+            animation: dotFlashing 1s infinite alternate;
+        }
+
+        @keyframes dotFlashing {
+            0% { opacity: 0.2; }
+            100% { opacity: 1; }
+        }
+
+        /* Markdown formatting inside chat */
+        .msg-bot h1, .msg-bot h2, .msg-bot h3 {
+            margin-top: 8px;
+            margin-bottom: 6px;
+            font-size: 1rem;
+            color: #fff;
+        }
+        .msg-bot ul, .msg-bot ol {
+            margin-left: 20px;
+            margin-bottom: 8px;
+        }
+        .msg-bot p {
+            margin-bottom: 8px;
+        }
+        .msg-bot code {
+            font-family: 'JetBrains Mono', monospace;
+            background: #0f172a;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="brand">
+            <div class="brand-icon">
+                <i class="fa-solid fa-car-burst"></i>
+            </div>
+            <div class="brand-title">
+                <h1>CypherPunks Emergency Vehicle AI</h1>
+                <p>On-Demand Roadside Breakdown Triage & Diagnostics System</p>
+            </div>
+        </div>
+        <div class="badge-guardrail">
+            <i class="fa-solid fa-shield-halved"></i> Strict Guardrail: Car Queries Only
+        </div>
+    </header>
+
+    <!-- Main Section -->
+    <div class="main-container">
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="card">
+                <div class="problem-tag"><i class="fa-solid fa-triangle-exclamation"></i> Problem Statement</div>
+                <div class="card-header"><i class="fa-solid fa-road"></i> Stranded Drivers on Remote Roads</div>
+                <p class="problem-desc">
+                    Drivers stuck on highways or hilly regions without active insurance RSA face hours of delays and no immediate mechanic connection.
+                    This AI acts as an <strong>instant emergency triage specialist</strong>.
+                </p>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><i class="fa-solid fa-bolt"></i> In-Vehicle Breakdown Tests</div>
+                <button class="quick-btn" onclick="sendQuick('My engine is overheating with steam billowing from under the hood. What should I do immediately?')">
+                    <i class="fa-solid fa-fire text-red-500"></i> Engine Overheating & Steam
+                </button>
+                <button class="quick-btn" onclick="sendQuick('I have a flat punctured tyre on a highway incline with no service station in sight.')">
+                    <i class="fa-solid fa-circle-notch"></i> Highway Flat Tyre Emergency
+                </button>
+                <button class="quick-btn" onclick="sendQuick('When turning the car ignition key, it just makes rapid clicking sounds and will not crank.')">
+                    <i class="fa-solid fa-car-battery"></i> Dead Battery / Starter Click
+                </button>
+                <button class="quick-btn" onclick="sendQuick('My brake pedal suddenly feels spongy and sinks all the way to the floorboard.')">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Spongy / Failing Brakes
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><i class="fa-solid fa-ban" style="color: #ef4444;"></i> Off-Topic Guardrail Tests</div>
+                <div class="guardrail-info" style="margin-bottom: 10px;">
+                    Requirement: If a user asks any query outside vehicle problems, the AI must immediately stop replying to it!
+                </div>
+                <button class="quick-btn danger" onclick="sendQuick('Can you write a poem about the sunrise?')">
+                    <i class="fa-solid fa-pen-nib"></i> Test: "Write a poem about sunrise"
+                </button>
+                <button class="quick-btn danger" onclick="sendQuick('Who won the Football World Cup in 2022?')">
+                    <i class="fa-solid fa-trophy"></i> Test: "Football World Cup winner"
+                </button>
+                <button class="quick-btn danger" onclick="sendQuick('Write python code to reverse a linked list.')">
+                    <i class="fa-solid fa-code"></i> Test: "Write python code"
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-section">
+            <div class="chat-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #10b981;"></span>
+                    <strong style="font-size: 0.95rem;">Emergency Diagnostics Session</strong>
+                </div>
+                <span id="session-tag" style="font-size: 0.75rem; color: var(--text-muted); font-family: 'JetBrains Mono';">Ready</span>
+            </div>
+
+            <div class="chat-messages" id="chat-messages">
+                <div class="msg-bubble msg-bot">
+                    <div class="bot-badge badge-vehicle"><i class="fa-solid fa-wrench"></i> CypherPunks Assistant</div>
+                    <p>Hello! I am your <strong>CypherPunks Roadside Vehicle Breakdown Specialist</strong>.</p>
+                    <p>Are you experiencing an in-vehicle problem, mechanical breakdown, warning light, or stranded on the road? Tell me what symptoms or sounds your vehicle is showing, and I will provide immediate safety instructions and diagnostic triage.</p>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typing-indicator">
+                <i class="fa-solid fa-gear fa-spin"></i> Analyzing vehicle problem...
+            </div>
+
+            <div class="chat-input-bar">
+                <input type="text" id="user-input" class="chat-input" placeholder="Describe your vehicle problem (e.g. engine knocking, flat tire, brake failure)..." onkeydown="handleKey(event)">
+                <button class="send-btn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i> Send</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const sessionId = "session-" + Math.random().toString(36).substring(2, 9);
+        document.getElementById('session-tag').innerText = sessionId;
+
+        function handleKey(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendQuick(text) {
+            document.getElementById('user-input').value = text;
+            sendMessage();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const query = input.value.trim();
+            if (!query) return;
+
+            input.value = '';
+            appendMessage(query, 'user');
+
+            // Show indicator
+            const indicator = document.getElementById('typing-indicator');
+            indicator.style.display = 'flex';
+            scrollBottom();
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-API-Key': 'cypherpunks-secret-key-2024'
+                    },
+                    body: JSON.stringify({ message: query, session_id: sessionId })
+                });
+
+
+                const data = await res.json();
+                indicator.style.display = 'none';
+
+                if (res.ok) {
+                    appendBotMessage(data.response, data.is_car_related);
+                } else {
+                    appendBotMessage("⚠️ Error processing request: " + (data.detail || 'Service unavailable'), false);
+                }
+            } catch (err) {
+                indicator.style.display = 'none';
+                appendBotMessage("⚠️ Connection error: Please check if backend server is running.", false);
+            }
+        }
+
+        function appendMessage(text, sender) {
+            const container = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = `msg-bubble msg-${sender}`;
+            div.innerText = text;
+            container.appendChild(div);
+            scrollBottom();
+        }
+
+        function appendBotMessage(markdownText, isCarRelated) {
+            const container = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = `msg-bubble msg-bot ${isCarRelated ? '' : 'out-of-scope'}`;
+
+            const badge = document.createElement('div');
+            badge.className = `bot-badge ${isCarRelated ? 'badge-vehicle' : 'badge-blocked'}`;
+            badge.innerHTML = isCarRelated 
+                ? '<i class="fa-solid fa-screwdriver-wrench"></i> Automotive Triage' 
+                : '<i class="fa-solid fa-shield-xmark"></i> Guardrail Triggered (Non-Car Query Stopped)';
+
+            const contentDiv = document.createElement('div');
+            contentDiv.innerHTML = marked.parse(markdownText);
+
+            div.appendChild(badge);
+            div.appendChild(contentDiv);
+            container.appendChild(div);
+            scrollBottom();
+        }
+
+        function scrollBottom() {
+            const container = document.getElementById('chat-messages');
+            container.scrollTop = container.scrollHeight;
+        }
+    </script>
+</body>
+</html>
