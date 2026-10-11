@@ -13,5 +13,7 @@ if not GOOGLE_API_KEY:
 
 # Default model
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+
+
 # Client API Key to restrict Flutter app access
 APP_API_KEY = os.getenv("APP_API_KEY", "cypherpunks-secret-key-2024")

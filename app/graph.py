@@ -24,6 +24,23 @@ def get_llm():
     )
 
 
+def extract_text(content: Any) -> str:
+    """Safely extracts a single clean string from LangChain content response."""
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = []
+        for item in content:
+            if isinstance(item, str):
+                parts.append(item)
+            elif isinstance(item, dict):
+                parts.append(str(item.get("text", item)))
+            else:
+                parts.append(str(item))
+        return "\n".join(parts).strip()
+    return str(content)
+
+
 # 1. Guardrail Classifier Node
 def guardrail_node(state: BreakdownState) -> Dict[str, Any]:
     """
@@ -54,7 +71,8 @@ Respond with ONLY a valid JSON object in this format:
 
     try:
         response = llm.invoke([SystemMessage(content="You are a strict JSON classifier."), HumanMessage(content=guardrail_prompt)])
-        content = response.content.strip()
+        content = extract_text(response.content).strip()
+
         # Clean markdown backticks if any
         if content.startswith("```json"):
             content = content[7:]
@@ -142,10 +160,11 @@ Keep all responses helpful, accurate, and easy to read on a mobile phone screen 
 
     response = llm.invoke(conversation)
     return {
-        "response": response.content,
+        "response": extract_text(response.content),
         "urgency": "IN_SCOPE_DIAGNOSED",
         "diagnosis": "Automotive diagnosis generated successfully."
     }
+
 
 
 # Routing Condition

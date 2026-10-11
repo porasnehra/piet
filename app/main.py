@@ -110,12 +110,20 @@ async def chat_endpoint(
         raise HTTPException(status_code=500, detail=f"Error executing AI graph: {str(e)}")
 
     is_car = result.get("is_car_related", False)
-    bot_response = result.get("response", "Could not process request.")
-    urgency = result.get("urgency", "UNKNOWN")
+    raw_response = result.get("response", "Could not process request.")
+    if isinstance(raw_response, list):
+        bot_response = "\n".join([item.get("text", str(item)) if isinstance(item, dict) else str(item) for item in raw_response])
+    elif not isinstance(raw_response, str):
+        bot_response = str(raw_response)
+    else:
+        bot_response = raw_response
+
+    urgency = str(result.get("urgency", "UNKNOWN"))
 
     # Record history
     SESSION_STORE[session_id].append({"role": "user", "content": user_query})
     SESSION_STORE[session_id].append({"role": "assistant", "content": bot_response})
+
 
     # Keep conversation window bounded
     if len(SESSION_STORE[session_id]) > 20:
