@@ -1,1 +1,1 @@
-# CypherPunks Emergency Vehicle Assistant
+"""CypherPunks Roadside Assistance & Vehicle Troubleshooting AI Backend."""

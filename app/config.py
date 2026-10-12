@@ -2,19 +2,14 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load .env from root directory
+# Load .env file from project root
 env_path = Path(__file__).resolve().parent.parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
-if not GOOGLE_API_KEY:
-    # also try direct environment variable
-    GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+PORT = int(os.getenv("PORT", "8000"))
+HOST = os.getenv("HOST", "0.0.0.0")
 
-# Default model (gemini-flash-latest is always up-to-date and universally available)
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-flash-latest")
-
-
-
-# Client API Key to restrict Flutter app access
-APP_API_KEY = os.getenv("APP_API_KEY", "cypherpunks-secret-key-2024")
+if not OPENAI_API_KEY:
+    print("[WARNING] OPENAI_API_KEY is not set in environment or .env file.")
