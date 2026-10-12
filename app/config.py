@@ -11,8 +11,9 @@ if not GOOGLE_API_KEY:
     # also try direct environment variable
     GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 
-# Default model
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+# Default model (gemini-flash-latest is always up-to-date and universally available)
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-flash-latest")
+
 
 
 # Client API Key to restrict Flutter app access

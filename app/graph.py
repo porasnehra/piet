@@ -16,12 +16,28 @@ class BreakdownState(TypedDict):
     response: str
 
 
-def get_llm():
-    return ChatGoogleGenerativeAI(
-        model=GEMINI_MODEL,
-        google_api_key=GOOGLE_API_KEY,
-        temperature=0.2,
-    )
+def invoke_llm(messages: List[BaseMessage]) -> Any:
+    """Attempts invocation with primary model, falling back to alternative flash models if restricted."""
+    candidate_models = [GEMINI_MODEL, "gemini-flash-latest", "gemini-3.8-flash"]
+    models_to_try = []
+    for m in candidate_models:
+        if m and m not in models_to_try:
+            models_to_try.append(m)
+
+    last_error = None
+    for model_name in models_to_try:
+        try:
+            llm = ChatGoogleGenerativeAI(
+                model=model_name,
+                google_api_key=GOOGLE_API_KEY,
+                temperature=0.2,
+            )
+            return llm.invoke(messages)
+        except Exception as e:
+            last_error = e
+            continue
+    raise last_error
+
 
 
 def extract_text(content: Any) -> str:
@@ -49,7 +65,6 @@ def guardrail_node(state: BreakdownState) -> Dict[str, Any]:
     If the query is unrelated (e.g. general questions, coding, recipes, casual chat),
     it is marked as out-of-scope to stop off-topic replies immediately.
     """
-    llm = get_llm()
     query = state["query"]
 
     guardrail_prompt = f"""You are a strict safety classifier for "CypherPunks Emergency Vehicle & Roadside Assistance AI".
@@ -70,8 +85,9 @@ Respond with ONLY a valid JSON object in this format:
 """
 
     try:
-        response = llm.invoke([SystemMessage(content="You are a strict JSON classifier."), HumanMessage(content=guardrail_prompt)])
+        response = invoke_llm([SystemMessage(content="You are a strict JSON classifier."), HumanMessage(content=guardrail_prompt)])
         content = extract_text(response.content).strip()
+
 
         # Clean markdown backticks if any
         if content.startswith("```json"):
@@ -119,7 +135,6 @@ def diagnostic_node(state: BreakdownState) -> Dict[str, Any]:
     Generates detailed, actionable automotive diagnostics and roadside triage
     for drivers dealing with vehicle problems or stranded situations.
     """
-    llm = get_llm()
     query = state["query"]
     history = state.get("messages", [])
 
@@ -158,12 +173,13 @@ Keep all responses helpful, accurate, and easy to read on a mobile phone screen 
 
     conversation.append(HumanMessage(content=query))
 
-    response = llm.invoke(conversation)
+    response = invoke_llm(conversation)
     return {
         "response": extract_text(response.content),
         "urgency": "IN_SCOPE_DIAGNOSED",
         "diagnosis": "Automotive diagnosis generated successfully."
     }
+
 
 
 
